@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { fetchLiveScores, type LiveMatch } from "@/app/actions/ai-scores"
+import { fetchLiveScores, type LiveMatch } from "@/app/actions/scores"
 import { teamCode } from "@/lib/teams"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"

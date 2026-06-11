@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import type { Match } from "@/lib/db/schema"
 import { publishResults, type ResultInput } from "@/app/actions/quiniela"
-import { fetchFinalResults } from "@/app/actions/ai-scores"
+import { fetchFinalResults } from "@/app/actions/scores"
 import { groupMatches } from "@/lib/scoring"
 import { teamCode, normalizeTeam } from "@/lib/teams"
 import { Card } from "@/components/ui/card"
