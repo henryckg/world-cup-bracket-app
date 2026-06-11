@@ -19,7 +19,8 @@ export type FinalResult = {
   awayScore: number
 }
 
-const MODEL = "google/gemini-2.5-flash"
+// Perplexity Sonar performs real-time web search natively, no grounding tool needed.
+const MODEL = "perplexity/sonar"
 
 function extractJson(text: string): unknown {
   // Strip code fences and find the first JSON array/object.
@@ -45,8 +46,6 @@ export async function fetchLiveScores(): Promise<{ matches: LiveMatch[]; checked
 
   const { text } = await generateText({
     model: MODEL,
-    // @ts-expect-error - google_search grounding tool is provider-specific
-    tools: { google_search: {} },
     prompt: `Hoy es ${today}. Busca en internet los partidos de FÚTBOL del Mundial / Copa del Mundo 2026 (FIFA World Cup 2026) que se jueguen HOY, incluyendo los que están EN VIVO en este momento y los que ya terminaron hoy.
 
 Devuelve EXCLUSIVAMENTE un arreglo JSON (sin texto adicional, sin markdown) con este formato exacto:
@@ -105,8 +104,6 @@ export async function fetchFinalResults(
 
   const { text } = await generateText({
     model: MODEL,
-    // @ts-expect-error - google_search grounding tool is provider-specific
-    tools: { google_search: {} },
     prompt: `Busca en internet los resultados FINALES reales de estos partidos del Mundial 2026 (FIFA World Cup 2026). Solo los partidos que ya terminaron:
 
 ${list}
