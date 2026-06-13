@@ -33,5 +33,9 @@ export function groupMatches(matches: Match[]) {
     arr.push(m)
     groups.set(m.groupLetter, arr)
   }
+  // Sort matches within each group by sortOrder
+  for (const [, arr] of groups) {
+    arr.sort((a, b) => a.sortOrder - b.sortOrder)
+  }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b))
 }
