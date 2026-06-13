@@ -31,7 +31,7 @@ export async function getPlayerByName(rawName: string) {
 // --- Matches ---
 
 export async function getMatches() {
-  return db.select().from(matches).orderBy(matches.sortOrder)
+  return db.select().from(matches).orderBy(matches.matchDate, matches.sortOrder)
 }
 
 // --- Predictions ---

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import type { Match, Player, Prediction } from "@/lib/db/schema"
 import { savePrediction } from "@/app/actions/quiniela"
-import { groupMatches, computePoints } from "@/lib/scoring"
+import { computePoints } from "@/lib/scoring"
 import { teamCode } from "@/lib/teams"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,7 +19,17 @@ type Props = {
 }
 
 export function PredictionsTab({ player, matches, predictions, onSaved }: Props) {
-  const grouped = useMemo(() => groupMatches(matches), [matches])
+  const sortedMatches = useMemo(() => {
+    return [...matches].sort((a, b) => {
+      // Sort by matchDate if available, otherwise by sortOrder
+      if (a.matchDate && b.matchDate) {
+        return new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
+      }
+      if (a.matchDate) return -1
+      if (b.matchDate) return 1
+      return a.sortOrder - b.sortOrder
+    })
+  }, [matches])
   const predMap = useMemo(() => {
     const m = new Map<number, Prediction>()
     for (const p of predictions) m.set(p.matchId, p)
@@ -43,27 +53,22 @@ export function PredictionsTab({ player, matches, predictions, onSaved }: Props)
         </Badge>
       </div>
 
-      {grouped.map(([letter, groupGames]) => (
-        <Card key={letter} className="overflow-hidden p-0">
-          <div className="flex items-center gap-2 border-b border-border bg-secondary/10 px-4 py-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-              {letter}
-            </span>
-            <h2 className="font-semibold text-foreground">Grupo {letter}</h2>
-          </div>
-          <div className="divide-y divide-border">
-            {groupGames.map((match) => (
-              <MatchRow
-                key={match.id}
-                match={match}
-                playerId={player.id}
-                prediction={predMap.get(match.id)}
-                onSaved={onSaved}
-              />
-            ))}
-          </div>
-        </Card>
-      ))}
+      <Card className="overflow-hidden p-0">
+        <div className="flex items-center gap-2 border-b border-border bg-secondary/10 px-4 py-2.5">
+          <h2 className="font-semibold text-foreground">Partidos en orden cronológico</h2>
+        </div>
+        <div className="divide-y divide-border">
+          {sortedMatches.map((match) => (
+            <MatchRow
+              key={match.id}
+              match={match}
+              playerId={player.id}
+              prediction={predMap.get(match.id)}
+              onSaved={onSaved}
+            />
+          ))}
+        </div>
+      </Card>
     </div>
   )
 }
@@ -122,6 +127,24 @@ function MatchRow({
 
   return (
     <div className="px-4 py-3.5">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 w-5 items-center justify-center rounded bg-primary text-xs font-bold text-primary-foreground">
+            {match.groupLetter}
+          </span>
+          <span className="text-xs text-muted-foreground">Grupo {match.groupLetter}</span>
+        </div>
+        {match.matchDate && (
+          <span className="text-xs text-muted-foreground">
+            {new Date(match.matchDate).toLocaleDateString("es-MX", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </span>
+        )}
+      </div>
       <div className="flex items-center justify-between gap-2">
         {/* Home */}
         <div className="flex flex-1 items-center justify-end gap-2">

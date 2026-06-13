@@ -24,6 +24,7 @@ export const matches = pgTable("matches", {
   awayScore: integer("away_score"),
   published: boolean("published").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
+  matchDate: timestamp("match_date", { withTimezone: true }),
 })
 
 export const predictions = pgTable(
